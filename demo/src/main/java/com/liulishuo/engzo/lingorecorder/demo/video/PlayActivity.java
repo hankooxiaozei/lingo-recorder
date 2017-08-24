@@ -2,7 +2,6 @@ package com.liulishuo.engzo.lingorecorder.demo.video;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,8 +12,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.liulishuo.engzo.lingorecorder.demo.R;
-import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
-import com.shuyu.gsyvideoplayer.video.NormalGSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
 import java.util.ArrayList;
@@ -31,9 +28,9 @@ public class PlayActivity extends Activity {
     public final static String TRANSITION = "TRANSITION";
 
 
-    NormalGSYVideoPlayer videoPlayer;
+    CustomUIVideo videoPlayer;
 
-    OrientationUtils orientationUtils;
+//    OrientationUtils orientationUtils;
 
     private boolean isTransition;
 
@@ -48,7 +45,17 @@ public class PlayActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video);
 //        ButterKnife.bind(this);
-        videoPlayer = (NormalGSYVideoPlayer)findViewById(R.id.video_player);
+        videoPlayer = (CustomUIVideo)findViewById(R.id.video_player);
+        videoPlayer.setOnCallBack(new CustomUIVideo.CallBack() {
+            @Override
+            public void onClickBack() {
+                finish();
+            }
+        });
+//        ImageView question = (ImageView)videoPlayer.findViewById(R.id.iv_question);
+//        final LinearLayout rl_container = (LinearLayout)videoPlayer.findViewById(R.id.layout_bottom);
+
+
         isTransition = getIntent().getBooleanExtra(TRANSITION, false);
         init();
     }
@@ -95,7 +102,7 @@ public class PlayActivity extends Activity {
 //        videoPlayer.getBackButton().setVisibility(View.VISIBLE);
 
         //设置旋转
-        orientationUtils = new OrientationUtils(this, videoPlayer);
+//        orientationUtils = new OrientationUtils(this, videoPlayer);
 
         //设置全屏按键功能,这是使用的是选择屏幕，而不是全屏
 //        videoPlayer.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
@@ -145,18 +152,18 @@ public class PlayActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (orientationUtils != null)
-            orientationUtils.releaseListener();
+//        if (orientationUtils != null)
+//            orientationUtils.releaseListener();
     }
 
     @Override
     public void onBackPressed() {
         //先返回正常状态
-        if (orientationUtils.getScreenType() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-
-            videoPlayer.getFullscreenButton().performClick();
-            return;
-        }
+//        if (orientationUtils.getScreenType() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+//
+//            videoPlayer.getFullscreenButton().performClick();
+//            return;
+//        }
         //释放所有
 //        videoPlayer.setStandardVideoAllCallBack(null);
         GSYVideoPlayer.releaseAllVideos();

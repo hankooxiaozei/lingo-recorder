@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.PopupWindow;
@@ -68,6 +69,25 @@ public  class CustomPopupWindow {
         if (mPopupWindow != null){
             View rootview = LayoutInflater.from(mContext).inflate(rootviewid,null);
             mPopupWindow.showAtLocation(rootview,gravity,x,y);
+        }
+        return this;
+    }
+
+    public CustomPopupWindow showAtLocation(View targetview,int gravity,int x,int y){
+        if (mPopupWindow != null){
+//            View rootview = LayoutInflater.from(mContext).inflate(rootviewid,null);
+            mPopupWindow.showAtLocation(targetview,gravity,x,y);
+        }
+        return this;
+    }
+
+    public CustomPopupWindow showAtLocation(View targetview){
+        if (mPopupWindow != null){
+            int[] location = new int[2];
+            targetview.getLocationOnScreen(location);
+
+//            View rootview = LayoutInflater.from(mContext).inflate(rootviewid,null);
+            mPopupWindow.showAtLocation(targetview, Gravity.NO_GRAVITY,location[0]+targetview.getWidth(),location[1]-mPopupWindow.getHeight());
         }
         return this;
     }
