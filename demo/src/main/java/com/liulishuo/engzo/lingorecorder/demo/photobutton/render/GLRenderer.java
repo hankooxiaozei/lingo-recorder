@@ -213,6 +213,9 @@ public class GLRenderer implements GLSurfaceView.Renderer
     @Override
     synchronized public void onFrameAvailable(SurfaceTexture surface) {
         updateSurface = true;
+        if (playerCallback!=null){
+            playerCallback.updateProgress();
+        }
     }
 
     @Override
@@ -231,5 +234,16 @@ public class GLRenderer implements GLSurfaceView.Renderer
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
+    }
+
+    PlayerCallback playerCallback;
+    public interface PlayerCallback{
+        void updateProgress();
+        void updateInfo();
+        void requestFinish();
+    }
+
+    public void setPlayerCallback(PlayerCallback playerCallback){
+        this.playerCallback=playerCallback;
     }
 }

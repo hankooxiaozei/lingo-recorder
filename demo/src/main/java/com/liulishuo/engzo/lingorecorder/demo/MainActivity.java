@@ -5,6 +5,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -16,7 +19,8 @@ import android.widget.TextView;
 import com.liulishuo.engzo.lingorecorder.demo.audiorecorder.DemoActivity;
 import com.liulishuo.engzo.lingorecorder.demo.cumstompop.CustomPopupWindow;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.render.RenderActivity;
-import com.liulishuo.engzo.lingorecorder.demo.videoplayer.PlayActivity;
+import com.liulishuo.engzo.lingorecorder.demo.video.DetailMoreTypeActivity;
+import com.liulishuo.engzo.lingorecorder.demo.video.PlayActivity;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.PermissionChecker;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.RecordSettings;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.ToastUtils;
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         if (!isPermissionOK) {
             ToastUtils.s(this, "Some permissions is not approved !!!");
         } else {
-            jumpToCaptureActivity(PlayActivity.class);
+//            jumpToCaptureActivity(PlayActivity.class);
         }
     }
 
@@ -135,6 +139,38 @@ public class MainActivity extends AppCompatActivity {
             ToastUtils.s(this, "Some permissions is not approved !!!");
         } else {
             jumpToTranscodeActivity();
+        }
+    }
+    public void onVideo1(View v) {
+        PermissionChecker checker = new PermissionChecker(this);
+        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
+        if (!isPermissionOK) {
+            ToastUtils.s(this, "Some permissions is not approved !!!");
+        } else {
+            Intent intent = new Intent(MainActivity.this, DetailMoreTypeActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    public void onVideo2(View view) {
+        PermissionChecker checker = new PermissionChecker(this);
+        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
+        if (!isPermissionOK) {
+            ToastUtils.s(this, "Some permissions is not approved !!!");
+        } else {
+            Intent intent = new Intent(MainActivity.this, PlayActivity.class);
+            intent.putExtra(PlayActivity.TRANSITION, false);
+
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                Pair pair = new Pair<>(view, PlayActivity.IMG_TRANSITION);
+                ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this, pair);
+                ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
+            } else {
+                startActivity(intent);
+                overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+            }
         }
     }
 

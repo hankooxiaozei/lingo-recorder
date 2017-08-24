@@ -8,6 +8,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -50,9 +53,9 @@ import java.io.IOException;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+
 public class VideoRecordActivity extends Activity implements PLRecordStateListener, PLVideoSaveListener, PLFocusListener {
     private static final String TAG = "VideoRecordActivity";
-
     /**
      * NOTICE: KIWI needs extra cost
      */
@@ -99,12 +102,14 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     private boolean isBorrow = false;
     private boolean isTooShort;
     private MediaPlayer mMediaPlayer;
-    private GLSurfaceView preview;
+//    private GLSurfaceView preview;
     private ViewGroup rootView;
-    private GLSurfaceView play_back;
+//    private GLSurfaceView play_back;
     private GLRenderer glRenderer;
     private MediaPlayer mediaPlayer;
     private String filePath;
+    private FrameLayout container;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,21 +117,18 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-
-
+        
         LayoutInflater inflater = getLayoutInflater();  //调用Activity的getLayoutInflater)
         rootView = (ViewGroup) inflater.inflate(R.layout.activity_record, null);
 
         setContentView(rootView);
 
-
-        //片段的progressBar
-//        mSectionProgressBar = (SectionProgressBar) findViewById(R.id.record_progressbar);
         //预览区
-        preview = (GLSurfaceView) findViewById(R.id.preview);
-        play_back = (GLSurfaceView) findViewById(R.id.play_back);
-        play_back.setEGLContextClientVersion(2);
+//        preview = (GLSurfaceView) findViewById(R.id.preview);
+//        play_back = (GLSurfaceView) findViewById(play_back);
+        container = (FrameLayout) findViewById(R.id.glsurface_container);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+
 //        SurfaceTexture viewById = (GLSurfaceView)findViewById(R.id.preview);
 //        mRecordBtn = findViewById(R.id.record);
         final CaptureLayout mCaptureLayout = (CaptureLayout) findViewById(R.id.layout_capture);
@@ -151,10 +153,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 CAMERA_STATE = STATE_WAIT;
 
                 isBorrow = false;
-//                mSwitchCamera.setRotation(0);
-//                mSwitchCamera.setVisibility(VISIBLE);
-//                CameraInterface.getInstance().setSwitchView(mSwitchCamera);
-
             }
 
             @Override
@@ -167,23 +165,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 isBorrow = true;
                 CAMERA_STATE = STATE_RUNNING;
 
-                //开始录像
-                //当前进度条为0
-//                if(!isRecording){
-//                    if (mShortVideoRecorder.beginSection()) {
-//                        //进度条不为0了
-//                        isRecording=!isRecording;
-////                        更新按钮的状态
-////                    updateRecordingBtns(true);
-//                    } else {
-//                        ToastUtils.s(VideoRecordActivity.this, "无法开始视频段录制");
-//                        Log.i("CJT", "startRecorder error");
-//                        mCaptureLayout.isRecord(false);
-//                        CAMERA_STATE = STATE_WAIT;
-//                        stopping = false;
-//                        isBorrow = false;
-//                    }
-//                }
                 if (isTooShort) {
                     mShortVideoRecorder.deleteLastSection();
                     isRecording = false;
@@ -210,15 +191,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 Log.i(TAG, "recordEnd: ");
                 if (isRecording) {
                     boolean b = mShortVideoRecorder.endSection();
-
-
-                    if (b) {
-
-                        Log.d("", "");
-
-
-//                        playMedia();
-                    }
                 }
             }
 
@@ -237,17 +209,29 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         mCaptureLayout.setTypeLisenter(new TypeLisenter() {
             @Override
             public void cancel() {
-                play_back.setVisibility(View.GONE);
-                preview.setVisibility(View.VISIBLE);
+                // TODO: 2017/8/22
+
+
+                if(View.GONE==container.findViewWithTag("preview").getVisibility()){
+                    container.findViewWithTag("preview").setVisibility(View.VISIBLE);
+                }
+                if(container.findViewWithTag("play_back")!=null){
+                    container.removeView(container.findViewWithTag("play_back"));
+                }
+
+//                container.removeAllViews();
+//                GLSurfaceView preview = new GLSurfaceView(VideoRecordActivity.this);
+//                preview.setTag("preview");
+//                container.addView(preview);
+
+//                play_back.setVisibility(View.GONE);
+//                preview.setVisibility(View.VISIBLE);
 
                 Log.i(TAG, "cancel: ");
                 if (!mShortVideoRecorder.deleteLastSection()) {
                     ToastUtils.s(VideoRecordActivity.this, "回删视频段失败");
                 }
-//                while(mShortVideoRecorder.deleteLastSection()){
-//
-//                }
-//                ToastUtils.s(VideoRecordActivity.this, "无法开始视频段录制");
+
                 //录像layout重新初始化一下
                 Log.i("CJT", "startRecorder error");
                 mCaptureLayout.isRecord(false);
@@ -257,29 +241,33 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 
                 //flag改为可录像状态
                 isRecording = !isRecording;
-//                if (CAMERA_STATE == STATE_WAIT) {
-//                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-//                        mMediaPlayer.stop();
-//                        mMediaPlayer.release();
-//                        mMediaPlayer = null;
-//                    }
-//                    handlerPictureOrVideo(type, false);
-//                }
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }
 
+                releaseMediaPlayer();
+
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void confirm() {
-                play_back.setVisibility(View.GONE);
-                preview.setVisibility(View.VISIBLE);
 
+                // TODO: 2017/8/22  
+//                play_back.setVisibility(View.GONE);
+//                preview.setVisibility(View.VISIBLE);
 
-                Log.i(TAG, "confirm: ");
+                if(GONE==container.findViewWithTag("preview").getVisibility()){
+                    container.findViewWithTag("preview").setVisibility(View.VISIBLE);
+//                    GLSurfaceView preview = new GLSurfaceView(VideoRecordActivity.this);
+//                    preview.setTag("preview");
+//                    preview.setEGLContextClientVersion(2);
+//
+//                    FrameLayout.LayoutParams previewParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+//                    preview.setLayoutParams(previewParams);
+//
+//                    container.addView(preview);
+                }
+                if(container.findViewWithTag("play_back")!=null){
+                    container.removeView(container.findViewWithTag("play_back"));
+                }
 
                 if (!mShortVideoRecorder.deleteLastSection()) {
                     ToastUtils.s(VideoRecordActivity.this, "回删视频段失败");
@@ -293,27 +281,9 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 isRecording=false;
 
                 if(filePath!=null&&!TextUtils.isEmpty(filePath)){
-//                    PlaybackActivity.start(VideoRecordActivity.this, filePath);
                     showChooseDialog();
                 }
-
-
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }
-//                mProcessingDialog.show();
-                //弹出对话框确认用户是否剪辑
-//                showChooseDialog();
-//                if (CAMERA_STATE == STATE_WAIT) {
-//                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-//                        mMediaPlayer.stop();
-//                        mMediaPlayer.release();
-//                        mMediaPlayer = null;
-//                    }
-//                    handlerPictureOrVideo(type, true);
-//                }
+                releaseMediaPlayer();
             }
         });
 
@@ -330,7 +300,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 mShortVideoRecorder.cancelConcat();
             }
         });
-
         //video的录像器
         mShortVideoRecorder = new PLShortVideoRecorder();
         //录像状态的监听
@@ -373,6 +342,13 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 
         //美颜的设置
         PLFaceBeautySetting faceBeautySetting = new PLFaceBeautySetting(1.0f, 0.5f, 0.5f);
+
+        GLSurfaceView preview = new GLSurfaceView(this);
+        preview.setTag("preview");
+        FrameLayout.LayoutParams previewParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        preview.setLayoutParams(previewParams);
+        preview.setEGLContextClientVersion(2);
+        container.addView(preview);
 
 //        //全部设置给recorder
         mShortVideoRecorder.prepare(preview, mCameraSetting, microphoneSetting, videoEncodeSetting,
@@ -422,37 +398,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 }
             });
         }
-
-        //设置最短的录像时长
-//        mSectionProgressBar.setFirstPointTime(RecordSettings.DEFAULT_MIN_RECORD_DURATION);
-//        设置最长的录像时长
-//        mSectionProgressBar.setTotalTime(RecordSettings.DEFAULT_MAX_RECORD_DURATION);
-
-        //录像按钮的touch
-//        mRecordBtn.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                int action = event.getAction();
-//                if (action == MotionEvent.ACTION_DOWN) {
-//                    //开始录像
-//                    if (mShortVideoRecorder.beginSection()) {
-////                        更新按钮的状态
-//                        updateRecordingBtns(true);
-//                    } else {
-//                        ToastUtils.s(VideoRecordActivity.this, "无法开始视频段录制");
-//                    }
-//                } else if (action == MotionEvent.ACTION_UP) {
-//                    //结束一段录制,等待新的一段录制
-//                    mShortVideoRecorder.endSection();
-//                    //                        更新按钮的状态
-//                    updateRecordingBtns(false);
-//                }
-//
-//                return false;
-//            }
-//        });
-
-
         //手势识别
         mGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -476,6 +421,14 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 //        onSectionCountChanged(0, 0);
     }
 
+    private void releaseMediaPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
     private void playMedia() {
         try {
             if (mMediaPlayer == null) {
@@ -483,7 +436,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
             } else {
                 mMediaPlayer.reset();
             }
-//                                    Log.i("CJT", "URL = " + url);
 
             String filePath = "/storage/emulated/0/ShortVideo/record.mp4";
             File file = new File(filePath);
@@ -598,7 +550,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         updateRecordingBtns(false);
         mShortVideoRecorder.pause();
 
-
 //        if (mediaPlayer != null) {
 //            mediaPlayer.stop();
 //            mediaPlayer.release();
@@ -613,38 +564,17 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
             mKiwiTrackWrapper.onDestroy(this);
         }
         mShortVideoRecorder.destroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+        releaseMediaPlayer();
     }
    /* 设置生命周期结束*/
 
-
-    //视频回删一段
-//    public void onClickDelete(View v) {
-//        if (!mShortVideoRecorder.deleteLastSection()) {
-//            ToastUtils.s(this, "回删视频段失败");
-//        }
-//    }
-
-//    //点击钩号
-//    public void onClickConcat(View v) {
-//
-//        mProcessingDialog.show();
-//        //弹出对话框确认用户是否剪辑
-//        showChooseDialog();
-//    }
 
     //点击切换换一个摄像头
     public void onClickSwitchCamera(View v) {
         if (mKiwiTrackWrapper != null) {
             mKiwiTrackWrapper.switchCamera(mCameraSetting.getCameraId());
-
         }
         mShortVideoRecorder.switchCamera();
-
     }
 
     //点击是否打开闪光灯
@@ -727,9 +657,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     public void onSectionIncreased(long incDuration, long totalDuration, int sectionCount) {
         Log.i(TAG, "section increased incDuration: " + incDuration + " totalDuration: " + totalDuration + " sectionCount: " + sectionCount);
 
-
-//        onSectionCountChanged(sectionCount, totalDuration);
-//        mSectionProgressBar.addBreakPointTime(totalDuration);
     }
 
     //删除前面一段视频的回删
@@ -769,6 +696,29 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         });
     }
 
+
+    private Handler handleProgress = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what)
+            {
+                case 0://更新进度条
+//                    int position = uiCallback.getPlayerCurrentPosition();
+//                    MediaPlayer mediaPlayer=glRenderer.getMediaPlayer();
+
+                    if(mediaPlayer!=null){
+                        int position = mediaPlayer.getCurrentPosition();
+                        if (position >= 0)
+                        {
+                            progressBar.setProgress(position);
+//                        String cur = UIUtils.getShowTime(position);
+//                        currTimeText.setText(cur);
+                        }
+                        break;
+                    }
+            }
+        }
+    };
+
     //取消
     @Override
     public void onSaveVideoCanceled() {
@@ -784,90 +734,103 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                if (glRenderer == null) {
-//                    glRenderer = new GLRenderer(VideoRecordActivity.this, filePath);//
+                // TODO: 2017/8/22  
+//                play_back.setVisibility(View.VISIBLE);
+//                preview.setVisibility(View.GONE);
 
-//                    MediaPlayer mediaPlayer = new MediaPlayer();//
-//                    try {//
-//                        mediaPlayer.setDataSource(VideoRecordActivity.this,Uri.parse(filePath));//
-//                    } catch (IOException e) {//
-//                        e.printStackTrace();//
-//                    }//
-//                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);//
-//                    mediaPlayer.setLooping(true);//
-//                    mediaPlayer.setOnVideoSizeChangedListener(glRenderer);//
-//                    glRenderer.setMediaPlayer(mediaPlayer);//
-//
-//                    play_back.setRenderer(glRenderer);//
-//                    play_back.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//
-//                }
-                play_back.setVisibility(View.VISIBLE);
-                preview.setVisibility(View.GONE);
+                if(container.findViewWithTag("play_back")==null){
+                    GLSurfaceView play_back = new GLSurfaceView(VideoRecordActivity.this);
+
+                    FrameLayout.LayoutParams playBackParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+                    play_back.setLayoutParams(playBackParams);
+
+                    play_back.setTag("play_back");
+                    play_back.setEGLContextClientVersion(2);
+                    container.addView(play_back);
+                }
+                if(container.findViewWithTag("preview")!=null&&View.VISIBLE==container.findViewWithTag("preview").getVisibility()){
+                    //                    七牛还在用,不能释放
+//                    container.removeView(container.findViewWithTag("preview"));
+                    container.findViewWithTag("preview").setVisibility(View.GONE);
+                }
+
                 if(glRenderer == null){
                     glRenderer = new GLRenderer(VideoRecordActivity.this);
+
+                    glRenderer.setPlayerCallback(new GLRenderer.PlayerCallback() {
+                        @Override
+                        public void updateProgress() {
+                            if(glRenderer.getMediaPlayer()!=null){
+                                handleProgress.sendEmptyMessage(0);
+                            }
+                        }
+
+                        @Override
+                        public void updateInfo() {
+
+                        }
+
+                        @Override
+                        public void requestFinish() {
+
+                        }
+                    });
+                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag("play_back");
+                    play_back.setRenderer(glRenderer);
+                    play_back.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+                }else{
+                    // TODO: 2017/8/22  
+                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag("play_back");
                     play_back.setRenderer(glRenderer);
                     play_back.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
                 }
+
                 if(mediaPlayer==null){
                     mediaPlayer = new MediaPlayer();
+
+
                     try {
                         mediaPlayer.setDataSource(VideoRecordActivity.this, Uri.parse(filePath));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.setLooping(true);
                     mediaPlayer.setOnVideoSizeChangedListener(glRenderer);
 
                     glRenderer.setMediaPlayer(mediaPlayer);
+                    int duration = glRenderer.getMediaPlayer().getDuration();
+                    progressBar.setMax(duration);
+                    progressBar.setVisibility(View.VISIBLE);
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Timer mTimer = new Timer();
+//                            TimerTask mTimerTask = new TimerTask() {
+//                                @Override
+//                                public void run() {
+//
+//                                    runOnUiThread(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//
+//                                            int currentPosition = mediaPlayer.getCurrentPosition();
+//                                            progressBar.setProgress(currentPosition);
+//
+//                                        }
+//                                    });
+//                                }
+//                            };
+//                            mTimer.schedule(mTimerTask, 0, 1000);
+//                        }
+//                    }).start();
+
+
+
                 }
-
-
             }
         });
-
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                //清空录像的东西
-//                mShortVideoRecorder.deleteLastSection();
-//                //把flag重新设为没有录像的状态
-//                isRecording = !isRecording;
-//
-//                mProcessingDialog.dismiss();
-//                if (mIsEditVideo) {
-////                    VideoEditActivity.start(VideoRecordActivity.this, filePath);
-//                } else {
-////                    PlaybackActivity.start(VideoRecordActivity.this, filePath);
-//                    VideoTexturePlaybackActivity.start(VideoRecordActivity.this, filePath, AVOptions.MEDIA_CODEC_SW_DECODE);
-//                }
-//            }
-//        });
-
-
-        // TODO: 2017/8/18
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                // TODO: 2017/8/16
-//                //清空录像的东西
-//                mShortVideoRecorder.deleteLastSection();
-//                //把flag重新设为没有录像的状态
-//                isRecording=!isRecording;
-//
-//                mProcessingDialog.dismiss();
-//                if (mIsEditVideo) {
-////                    VideoEditActivity.start(VideoRecordActivity.this, filePath);
-//                } else {
-////                    PlaybackActivity.start(VideoRecordActivity.this, filePath);
-//                    VideoTexturePlaybackActivity.start(VideoRecordActivity.this, filePath, AVOptions.MEDIA_CODEC_SW_DECODE);
-//                }
-//            }
-//        });
-
-
     }
 
     //刷新,重新初始化
@@ -902,16 +865,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 //        mAdjustBrightnessSeekBar.setProgress(Math.abs(min));
 //    }
 
-    //视频段数改变的时候执行
-//    private void onSectionCountChanged(final int count, final long totalTime) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-////                mDeleteBtn.setEnabled(count > 0);
-////                mConcatBtn.setEnabled(totalTime >= RecordSettings.DEFAULT_MIN_RECORD_DURATION);
-//            }
-//        });
-//    }
 
     private PLCameraSetting.CAMERA_PREVIEW_SIZE_RATIO getPreviewSizeRatio(int position) {
         return RecordSettings.PREVIEW_SIZE_RATIO_ARRAY[position];
@@ -960,8 +913,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 //                mShortVideoRecorder.concatSections(VideoRecordActivity.this);
             }
         });
-
-
         // TODO: 2017/8/16
         //把之前录的清空
         builder.setCancelable(false);

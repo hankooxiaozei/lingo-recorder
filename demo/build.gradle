@@ -49,5 +49,14 @@ dependencies {
     compile project(':kiwi')
 
     compile 'com.qiniu:happy-dns:0.2.+'
-    compile files('libs/pldroid-player-1.6.0.jar')
+//    compile files('libs/pldroid-player-1.6.0.jar')
+
+
+    compile 'com.shuyu:gsyVideoPlayer-java:2.0.4'
+
+    compile 'com.shuyu:gsyVideoPlayer-x86:2.0.4'
+    compile 'com.shuyu:gsyVideoPlayer-arm64:2.0.4'
+    compile 'com.shuyu:gsyVideoPlayer-armv7a:2.0.4'
+    compile 'com.shuyu:gsyVideoPlayer-armv5:2.0.4'
+
 }
