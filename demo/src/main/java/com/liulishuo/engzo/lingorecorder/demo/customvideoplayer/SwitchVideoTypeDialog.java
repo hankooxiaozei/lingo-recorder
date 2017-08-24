@@ -1,4 +1,4 @@
-package com.liulishuo.engzo.lingorecorder.demo.video;
+package com.liulishuo.engzo.lingorecorder.demo.customvideoplayer;
 
 import android.app.Dialog;
 import android.content.Context;

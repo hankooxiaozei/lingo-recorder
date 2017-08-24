@@ -1,4 +1,4 @@
-package com.liulishuo.engzo.lingorecorder.demo.videoplayer;
+package com.liulishuo.engzo.lingorecorder.demo.qiniuvideoplayer;
 
 import android.app.Activity;
 import android.os.Build;

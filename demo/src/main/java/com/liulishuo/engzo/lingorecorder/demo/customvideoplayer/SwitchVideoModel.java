@@ -1,4 +1,4 @@
-package com.liulishuo.engzo.lingorecorder.demo.video;
+package com.liulishuo.engzo.lingorecorder.demo.customvideoplayer;
 
 /**
  * Created by shuyu on 2016/12/7.

@@ -46,24 +46,24 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.liulishuo.engzo.lingorecorder.demo.videoplayer.PLVideoTextureActivity"
+            android:name="com.liulishuo.engzo.lingorecorder.demo.qiniuvideoplayer.PLVideoTextureActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.liulishuo.engzo.lingorecorder.demo.videoplayer.VideoFileActivity"
+            android:name="com.liulishuo.engzo.lingorecorder.demo.qiniuvideoplayer.VideoFileActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.liulishuo.engzo.lingorecorder.demo.videoplayer.PlayActivity"
+            android:name="com.liulishuo.engzo.lingorecorder.demo.qiniuvideoplayer.PlayActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.liulishuo.engzo.lingorecorder.demo.video.DetailMoreTypeActivity"
+            android:name="com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.DetailMoreTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.liulishuo.engzo.lingorecorder.demo.video.PlayActivity"
+            android:name="com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.PlayActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" />
 
