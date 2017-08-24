@@ -78,6 +78,13 @@
             android:text="CustomVideoPlayer2" />
 
         <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:onClick="onVideo3"
+            android:text="播放音频" />
+
+        <Button
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

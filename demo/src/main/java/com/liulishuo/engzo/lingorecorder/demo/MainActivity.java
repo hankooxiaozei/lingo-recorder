@@ -15,6 +15,7 @@ import android.widget.Spinner;
 
 import com.liulishuo.engzo.lingorecorder.demo.audiorecorder.DemoActivity;
 import com.liulishuo.engzo.lingorecorder.demo.cumstompop.CustomPopupWindow;
+import com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.MediaPlayerActivity;
 import com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.PlayActivity;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.PermissionChecker;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.RecordSettings;
@@ -120,6 +121,16 @@ public class MainActivity extends AppCompatActivity {
             ToastUtils.s(this, "Some permissions is not approved !!!");
         } else {
             jumpToImportActivity();
+        }
+    }
+    public void onVideo3(View v) {
+        PermissionChecker checker = new PermissionChecker(this);
+        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
+        if (!isPermissionOK) {
+            ToastUtils.s(this, "Some permissions is not approved !!!");
+        } else {
+            Intent intent = new Intent(MainActivity.this, MediaPlayerActivity.class);
+            startActivity(intent);
         }
     }
 

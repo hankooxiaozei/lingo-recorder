@@ -47,9 +47,9 @@ public class DemoActivity extends AppCompatActivity {
     public static final String FLAC = "androidFlac";
     public static final String SCORER = "localScorer";
     public static final String TIMER = "timer";
-        public static final String SAVE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getPath();
-        public static final String SAVE_NAME_WAV = File.separator+"test.wav";
-        public static final String SAVE_NAME_FLAC = File.separator+"test.flac";
+    public static final String SAVE_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getPath();
+    public static final String SAVE_NAME_WAV = File.separator+"test.wav";
+    public static final String SAVE_NAME_FLAC = File.separator+"test.flac";
 
     private static final int REQUEST_CODE_PERMISSION = 10010;
     private TextView resultView;
@@ -85,7 +85,8 @@ public class DemoActivity extends AppCompatActivity {
         lingoRecorder = new LingoRecorder();
 
 //        lingoRecorder.put(WAV, new WavProcessor("/sdcard/test.wav"));
-        lingoRecorder.put(WAV, new WavProcessor(SAVE_PATH+SAVE_NAME_WAV));
+        String filePath = SAVE_PATH + SAVE_NAME_WAV;
+        lingoRecorder.put(WAV, new WavProcessor(filePath));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             lingoRecorder.put(FLAC, new AndroidFlacProcessor(SAVE_PATH+SAVE_NAME_FLAC));
 //            lingoRecorder.put(FLAC, new AndroidFlacProcessor("/sdcard/test.flac"));
