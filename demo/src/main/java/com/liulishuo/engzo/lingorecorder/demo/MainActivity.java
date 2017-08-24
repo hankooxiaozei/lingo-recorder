@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.liulishuo.engzo.lingorecorder.demo.audiorecorder.DemoActivity;
 import com.liulishuo.engzo.lingorecorder.demo.cumstompop.CustomPopupWindow;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.render.RenderActivity;
-import com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.DetailMoreTypeActivity;
+
 import com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.PlayActivity;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.PermissionChecker;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.RecordSettings;
@@ -141,16 +141,16 @@ public class MainActivity extends AppCompatActivity {
             jumpToTranscodeActivity();
         }
     }
-    public void onVideo1(View v) {
-        PermissionChecker checker = new PermissionChecker(this);
-        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
-        if (!isPermissionOK) {
-            ToastUtils.s(this, "Some permissions is not approved !!!");
-        } else {
-            Intent intent = new Intent(MainActivity.this, DetailMoreTypeActivity.class);
-            startActivity(intent);
-        }
-    }
+//    public void onVideo1(View v) {
+//        PermissionChecker checker = new PermissionChecker(this);
+//        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
+//        if (!isPermissionOK) {
+//            ToastUtils.s(this, "Some permissions is not approved !!!");
+//        } else {
+//            Intent intent = new Intent(MainActivity.this, DetailMoreTypeActivity.class);
+//            startActivity(intent);
+//        }
+//    }
 
     public void onVideo2(View view) {
         PermissionChecker checker = new PermissionChecker(this);
