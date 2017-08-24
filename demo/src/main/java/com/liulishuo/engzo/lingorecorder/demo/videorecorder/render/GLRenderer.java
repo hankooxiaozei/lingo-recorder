@@ -1,4 +1,4 @@
-package com.liulishuo.engzo.lingorecorder.demo.photobutton.render;
+package com.liulishuo.engzo.lingorecorder.demo.videorecorder.render;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -78,12 +78,6 @@ public class GLRenderer implements GLSurfaceView.Renderer
                 .asFloatBuffer()
                 .put(textureVertexData);
         textureVertexBuffer.position(0);
-
-
-
-
-
-
 
         // TODO: 2017/8/17
 //        mediaPlayer=new MediaPlayer();

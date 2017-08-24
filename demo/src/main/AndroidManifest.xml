@@ -68,7 +68,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".photobutton.render.RenderActivity"
+            android:name=".videorecorder.render.RenderActivity"
 
 
             android:screenOrientation="portrait" />

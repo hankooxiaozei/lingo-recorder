@@ -1,8 +1,6 @@
 package com.liulishuo.engzo.lingorecorder.demo;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -14,12 +12,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.liulishuo.engzo.lingorecorder.demo.audiorecorder.DemoActivity;
 import com.liulishuo.engzo.lingorecorder.demo.cumstompop.CustomPopupWindow;
-import com.liulishuo.engzo.lingorecorder.demo.photobutton.render.RenderActivity;
-
 import com.liulishuo.engzo.lingorecorder.demo.customvideoplayer.PlayActivity;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.PermissionChecker;
 import com.liulishuo.engzo.lingorecorder.demo.videorecorder.RecordSettings;
@@ -38,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        TextView versionInfoTextView = (TextView) findViewById(R.id.VersionInfoTextView);
-//        String info = "版本号：" + getVersionDescription() + "，编译时间：" + getBuildTimeDescription();
-//        versionInfoTextView.setText(info);
 
         mPreviewSizeRatioSpinner = (Spinner) findViewById(R.id.PreviewSizeRatioSpinner);
         mPreviewSizeLevelSpinner = (Spinner) findViewById(R.id.PreviewSizeLevelSpinner);
@@ -83,15 +74,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onClickRender(View v) {
-        PermissionChecker checker = new PermissionChecker(this);
-        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
-        if (!isPermissionOK) {
-            ToastUtils.s(this, "Some permissions is not approved !!!");
-        } else {
-            jumpToCaptureActivity(RenderActivity.class);
-        }
-    }
+//    public void onClickRender(View v) {
+//        PermissionChecker checker = new PermissionChecker(this);
+//        boolean isPermissionOK = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checker.checkPermission();
+//        if (!isPermissionOK) {
+//            ToastUtils.s(this, "Some permissions is not approved !!!");
+//        } else {
+//            jumpToCaptureActivity(RenderActivity.class);
+//        }
+//    }
 
     public void onClickPop(View v) {
         PermissionChecker checker = new PermissionChecker(this);
@@ -208,16 +199,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private String getVersionDescription() {
-        PackageManager packageManager = getPackageManager();
-        try {
-            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
-            return packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return "未知";
-    }
+//    private String getVersionDescription() {
+//        PackageManager packageManager = getPackageManager();
+//        try {
+//            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
+//            return packageInfo.versionName;
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        return "未知";
+//    }
 
 //    protected String getBuildTimeDescription() {
 //        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(BuildConfig.BUILD_TIMESTAMP);

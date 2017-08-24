@@ -11,8 +11,6 @@ public class Config {
     public static final String DOMAIN = "shortvideo.pdex-service.com";
 
 
-
-
     public static final String VIDEO_STORAGE_DIR = Environment.getExternalStorageDirectory() + "/ShortVideo";
     public static final String RECORD_FILE_PATH = VIDEO_STORAGE_DIR + "/record.mp4";
     public static final String EDITED_FILE_PATH = VIDEO_STORAGE_DIR + "/edited.mp4";

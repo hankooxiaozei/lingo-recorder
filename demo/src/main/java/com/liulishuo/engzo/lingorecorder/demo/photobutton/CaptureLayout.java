@@ -15,7 +15,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.lisenter.CaptureLisenter;
-import com.liulishuo.engzo.lingorecorder.demo.photobutton.lisenter.ReturnLisenter;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.lisenter.TypeLisenter;
 
 
@@ -34,7 +33,7 @@ public class CaptureLayout extends FrameLayout {
     //拍照或录制后接结果按钮监听
     private TypeLisenter typeLisenter;
     //退出按钮监听
-    private ReturnLisenter returnLisenter;
+//    private ReturnLisenter returnLisenter;
 
     public void setTypeLisenter(TypeLisenter typeLisenter) {
         this.typeLisenter = typeLisenter;
@@ -44,9 +43,9 @@ public class CaptureLayout extends FrameLayout {
         this.captureLisenter = captureLisenter;
     }
 
-    public void setReturnLisenter(ReturnLisenter returnLisenter) {
-        this.returnLisenter = returnLisenter;
-    }
+//    public void setReturnLisenter(ReturnLisenter returnLisenter) {
+//        this.returnLisenter = returnLisenter;
+//    }
 
     private CaptureButton btn_capture;
     private TypeButton btn_confirm;

@@ -27,12 +27,11 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.kiwi.ui.StickerConfigMgr;
-import com.kiwi.ui.widget.KwControlView;
 import com.liulishuo.engzo.lingorecorder.demo.R;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.CaptureLayout;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.lisenter.CaptureLisenter;
 import com.liulishuo.engzo.lingorecorder.demo.photobutton.lisenter.TypeLisenter;
-import com.liulishuo.engzo.lingorecorder.demo.photobutton.render.GLRenderer;
+import com.liulishuo.engzo.lingorecorder.demo.videorecorder.render.GLRenderer;
 import com.qiniu.pili.droid.shortvideo.PLAudioEncodeSetting;
 import com.qiniu.pili.droid.shortvideo.PLCameraSetting;
 import com.qiniu.pili.droid.shortvideo.PLErrorCode;
@@ -55,6 +54,9 @@ import static android.view.View.VISIBLE;
 
 
 public class VideoRecordActivity extends Activity implements PLRecordStateListener, PLVideoSaveListener, PLFocusListener {
+    private static final String PREVIEW="preview";
+    private static final String PLAYBACK="play_back";
+
     private static final String TAG = "VideoRecordActivity";
     /**
      * NOTICE: KIWI needs extra cost
@@ -63,11 +65,8 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 
     private PLShortVideoRecorder mShortVideoRecorder;
 
-    //    private SectionProgressBar mSectionProgressBar;
-    private CustomProgressDialog mProcessingDialog;
-    //    private View mRecordBtn;
-//    private View mDeleteBtn;
-//    private View mConcatBtn;
+//    private CustomProgressDialog mProcessingDialog;
+
     private View mSwitchCameraBtn;
     private View mSwitchFlashBtn;
     private FocusIndicator mFocusIndicator;
@@ -82,7 +81,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     private PLCameraSetting mCameraSetting;
 
     private KiwiTrackWrapper mKiwiTrackWrapper;
-    private KwControlView mControlView;
 
     private int mFocusIndicatorX;
     private int mFocusIndicatorY;
@@ -102,9 +100,9 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     private boolean isBorrow = false;
     private boolean isTooShort;
     private MediaPlayer mMediaPlayer;
-//    private GLSurfaceView preview;
+
     private ViewGroup rootView;
-//    private GLSurfaceView play_back;
+
     private GLRenderer glRenderer;
     private MediaPlayer mediaPlayer;
     private String filePath;
@@ -124,13 +122,10 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         setContentView(rootView);
 
         //预览区
-//        preview = (GLSurfaceView) findViewById(R.id.preview);
-//        play_back = (GLSurfaceView) findViewById(play_back);
+
         container = (FrameLayout) findViewById(R.id.glsurface_container);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
-//        SurfaceTexture viewById = (GLSurfaceView)findViewById(R.id.preview);
-//        mRecordBtn = findViewById(R.id.record);
         final CaptureLayout mCaptureLayout = (CaptureLayout) findViewById(R.id.layout_capture);
         mCaptureLayout.setDuration(10 * 1000);
 
@@ -212,11 +207,11 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 // TODO: 2017/8/22
 
 
-                if(View.GONE==container.findViewWithTag("preview").getVisibility()){
-                    container.findViewWithTag("preview").setVisibility(View.VISIBLE);
+                if(View.GONE==container.findViewWithTag(PREVIEW).getVisibility()){
+                    container.findViewWithTag(PREVIEW).setVisibility(View.VISIBLE);
                 }
-                if(container.findViewWithTag("play_back")!=null){
-                    container.removeView(container.findViewWithTag("play_back"));
+                if(container.findViewWithTag(PLAYBACK)!=null){
+                    container.removeView(container.findViewWithTag(PLAYBACK));
                 }
 
 //                container.removeAllViews();
@@ -254,19 +249,12 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 //                play_back.setVisibility(View.GONE);
 //                preview.setVisibility(View.VISIBLE);
 
-                if(GONE==container.findViewWithTag("preview").getVisibility()){
-                    container.findViewWithTag("preview").setVisibility(View.VISIBLE);
-//                    GLSurfaceView preview = new GLSurfaceView(VideoRecordActivity.this);
-//                    preview.setTag("preview");
-//                    preview.setEGLContextClientVersion(2);
-//
-//                    FrameLayout.LayoutParams previewParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-//                    preview.setLayoutParams(previewParams);
-//
-//                    container.addView(preview);
+                if(GONE==container.findViewWithTag(PREVIEW).getVisibility()){
+                    container.findViewWithTag(PREVIEW).setVisibility(View.VISIBLE);
+
                 }
-                if(container.findViewWithTag("play_back")!=null){
-                    container.removeView(container.findViewWithTag("play_back"));
+                if(container.findViewWithTag(PLAYBACK)!=null){
+                    container.removeView(container.findViewWithTag(PLAYBACK));
                 }
 
                 if (!mShortVideoRecorder.deleteLastSection()) {
@@ -293,13 +281,13 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         mAdjustBrightnessSeekBar = (SeekBar) findViewById(R.id.adjust_brightness);
 
         //进行处理的对话框
-        mProcessingDialog = new CustomProgressDialog(this);
-        mProcessingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                mShortVideoRecorder.cancelConcat();
-            }
-        });
+//        mProcessingDialog = new CustomProgressDialog(this);
+//        mProcessingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                mShortVideoRecorder.cancelConcat();
+//            }
+//        });
         //video的录像器
         mShortVideoRecorder = new PLShortVideoRecorder();
         //录像状态的监听
@@ -328,7 +316,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         //video编码的设置
         PLVideoEncodeSetting videoEncodeSetting = new PLVideoEncodeSetting(this);
         videoEncodeSetting.setEncodingSizeLevel(getEncodingSizeLevel(17));
-//        videoEncodeSetting.setEncodingSizeLevel({1280, 720});
         videoEncodeSetting.setEncodingBitrate(getEncodingBitrateLevel(6));
 
         //音频的设置
@@ -344,7 +331,7 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         PLFaceBeautySetting faceBeautySetting = new PLFaceBeautySetting(1.0f, 0.5f, 0.5f);
 
         GLSurfaceView preview = new GLSurfaceView(this);
-        preview.setTag("preview");
+        preview.setTag(PREVIEW);
         FrameLayout.LayoutParams previewParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         preview.setLayoutParams(previewParams);
         preview.setEGLContextClientVersion(2);
@@ -361,9 +348,9 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
             mKiwiTrackWrapper = new KiwiTrackWrapper(this, mCameraSetting.getCameraId());
             mKiwiTrackWrapper.onCreate(this);
 
-            mControlView = (KwControlView) findViewById(R.id.kiwi_control_layout);
-            mControlView.setOnEventListener(mKiwiTrackWrapper.initUIEventListener());
-            mControlView.setVisibility(VISIBLE);
+//            mControlView = (KwControlView) findViewById(R.id.kiwi_control_layout);
+//            mControlView.setOnEventListener(mKiwiTrackWrapper.initUIEventListener());
+//            mControlView.setVisibility(VISIBLE);
 
             mShortVideoRecorder.setVideoFilterListener(new PLVideoFilterListener() {
 
@@ -417,8 +404,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                 return true;
             }
         });
-        //手动地把段progess,调到0
-//        onSectionCountChanged(0, 0);
     }
 
     private void releaseMediaPlayer() {
@@ -441,7 +426,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
             File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             mMediaPlayer.setDataSource(fis.getFD());
-
 
             //用同一个SurfaceView
             SurfaceTexture surfaceTexture = new SurfaceTexture(textureId);
@@ -578,11 +562,11 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     }
 
     //点击是否打开闪光灯
-    public void onClickSwitchFlash(View v) {
-        mFlashEnabled = !mFlashEnabled;
-        mShortVideoRecorder.setFlashEnabled(mFlashEnabled);
-        mSwitchFlashBtn.setActivated(mFlashEnabled);
-    }
+//    public void onClickSwitchFlash(View v) {
+//        mFlashEnabled = !mFlashEnabled;
+//        mShortVideoRecorder.setFlashEnabled(mFlashEnabled);
+//        mSwitchFlashBtn.setActivated(mFlashEnabled);
+//    }
 
     //准备开始录制的一些初始化回调
     @Override
@@ -681,7 +665,7 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     //保存到本地,进度更新的回调
     @Override
     public void onProgressUpdate(float percentage) {
-        mProcessingDialog.setProgress((int) (100 * percentage));
+//        mProcessingDialog.setProgress((int) (100 * percentage));
     }
 
     //保存到本地失败的回调
@@ -690,7 +674,7 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProcessingDialog.dismiss();
+//                mProcessingDialog.dismiss();
                 ToastUtils.s(VideoRecordActivity.this, "拼接视频段失败: " + errorCode);
             }
         });
@@ -702,8 +686,6 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
             switch (msg.what)
             {
                 case 0://更新进度条
-//                    int position = uiCallback.getPlayerCurrentPosition();
-//                    MediaPlayer mediaPlayer=glRenderer.getMediaPlayer();
 
                     if(mediaPlayer!=null){
                         int position = mediaPlayer.getCurrentPosition();
@@ -722,7 +704,7 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
     //取消
     @Override
     public void onSaveVideoCanceled() {
-        mProcessingDialog.dismiss();
+//        mProcessingDialog.dismiss();
     }
 
     //保存成功
@@ -738,20 +720,20 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 //                play_back.setVisibility(View.VISIBLE);
 //                preview.setVisibility(View.GONE);
 
-                if(container.findViewWithTag("play_back")==null){
+                if(container.findViewWithTag(PLAYBACK)==null){
                     GLSurfaceView play_back = new GLSurfaceView(VideoRecordActivity.this);
 
                     FrameLayout.LayoutParams playBackParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
                     play_back.setLayoutParams(playBackParams);
 
-                    play_back.setTag("play_back");
+                    play_back.setTag(PLAYBACK);
                     play_back.setEGLContextClientVersion(2);
                     container.addView(play_back);
                 }
-                if(container.findViewWithTag("preview")!=null&&View.VISIBLE==container.findViewWithTag("preview").getVisibility()){
+                if(container.findViewWithTag(PREVIEW)!=null&&View.VISIBLE==container.findViewWithTag(PREVIEW).getVisibility()){
                     //                    七牛还在用,不能释放
 //                    container.removeView(container.findViewWithTag("preview"));
-                    container.findViewWithTag("preview").setVisibility(View.GONE);
+                    container.findViewWithTag(PREVIEW).setVisibility(View.GONE);
                 }
 
                 if(glRenderer == null){
@@ -775,19 +757,18 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
 
                         }
                     });
-                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag("play_back");
+                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag(PLAYBACK);
                     play_back.setRenderer(glRenderer);
                     play_back.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
                 }else{
                     // TODO: 2017/8/22  
-                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag("play_back");
+                    GLSurfaceView play_back = (GLSurfaceView) container.findViewWithTag(PLAYBACK);
                     play_back.setRenderer(glRenderer);
                     play_back.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
                 }
 
                 if(mediaPlayer==null){
                     mediaPlayer = new MediaPlayer();
-
 
                     try {
                         mediaPlayer.setDataSource(VideoRecordActivity.this, Uri.parse(filePath));
@@ -803,68 +784,10 @@ public class VideoRecordActivity extends Activity implements PLRecordStateListen
                     int duration = glRenderer.getMediaPlayer().getDuration();
                     progressBar.setMax(duration);
                     progressBar.setVisibility(View.VISIBLE);
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Timer mTimer = new Timer();
-//                            TimerTask mTimerTask = new TimerTask() {
-//                                @Override
-//                                public void run() {
-//
-//                                    runOnUiThread(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//
-//                                            int currentPosition = mediaPlayer.getCurrentPosition();
-//                                            progressBar.setProgress(currentPosition);
-//
-//                                        }
-//                                    });
-//                                }
-//                            };
-//                            mTimer.schedule(mTimerTask, 0, 1000);
-//                        }
-//                    }).start();
-
-
-
                 }
             }
         });
     }
-
-    //刷新,重新初始化
-//    private void refreshSeekBar() {
-//        final int max = mShortVideoRecorder.getMaxExposureCompensation();
-//        final int min = mShortVideoRecorder.getMinExposureCompensation();
-//        boolean brightnessAdjustAvailable = (max != 0 || min != 0);
-//        Log.e(TAG, "max/min exposure compensation: " + max + "/" + min + " brightness adjust available: " + brightnessAdjustAvailable);
-//
-//        findViewById(R.id.brightness_panel).setVisibility(brightnessAdjustAvailable ? VISIBLE : GONE);
-//        mAdjustBrightnessSeekBar.setOnSeekBarChangeListener(!brightnessAdjustAvailable ? null : new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//                if (i <= Math.abs(min)) {
-//                    mShortVideoRecorder.setExposureCompensation(i + min);
-//                } else {
-//                    mShortVideoRecorder.setExposureCompensation(i - max);
-//                }
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
-//        mAdjustBrightnessSeekBar.setMax(max + Math.abs(min));
-//        mAdjustBrightnessSeekBar.setProgress(Math.abs(min));
-//    }
-
 
     private PLCameraSetting.CAMERA_PREVIEW_SIZE_RATIO getPreviewSizeRatio(int position) {
         return RecordSettings.PREVIEW_SIZE_RATIO_ARRAY[position];

@@ -1,4 +1,4 @@
-package com.liulishuo.engzo.lingorecorder.demo.photobutton.render;
+package com.liulishuo.engzo.lingorecorder.demo.videorecorder.render;
 
 import android.content.Context;
 import android.opengl.GLES20;
